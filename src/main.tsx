@@ -1,7 +1,6 @@
 import * as React from "react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { CalendarDays, Clock, Heart, MapPin, Mic2, Music2, Sparkles, Volume2 } from "lucide-react";
 import "./styles.css";
 
 const weddingDate = new Date("2026-10-18T11:00:00-03:00");
@@ -36,22 +35,22 @@ function useCountdown() {
   return countdown;
 }
 
-function CountdownTile({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="countdown-tile">
-      <strong>{String(value).padStart(2, "0")}</strong>
-      <span>{label}</span>
-    </div>
-  );
-}
-
 function App() {
   const countdown = useCountdown();
   const audioRef = React.useRef<HTMLAudioElement>(null);
   const shellRef = React.useRef<HTMLElement>(null);
   const audioSrc = `${import.meta.env.BASE_URL}audio/cant-help-falling-in-love.mp3`;
+  const model4EnvelopeSrc = `${import.meta.env.BASE_URL}images/modelo-4-envelope-las-vegas.png`;
+  const vegasBackgroundSrc = `${import.meta.env.BASE_URL}images/fundo-10-vegas-romantico.png`;
+  const autoralTemplateSrc = `${import.meta.env.BASE_URL}images/autoral-1-template.png`;
   const [isOpen, setIsOpen] = React.useState(false);
   const [audioState, setAudioState] = React.useState<"ready" | "playing" | "missing">("ready");
+  const countdownItems = [
+    { label: "dias", value: countdown.days },
+    { label: "horas", value: countdown.hours },
+    { label: "min", value: countdown.minutes },
+    { label: "seg", value: countdown.seconds },
+  ];
 
   function updatePointerGlow(event: React.PointerEvent<HTMLElement>) {
     const shell = shellRef.current;
@@ -84,114 +83,57 @@ function App() {
     <main
       ref={shellRef}
       className={`page-shell ${isOpen ? "invite-open" : ""}`}
+      style={{ "--vegas-background": `url(${vegasBackgroundSrc})` } as React.CSSProperties}
       onPointerMove={updatePointerGlow}
     >
       <audio ref={audioRef} src={audioSrc} preload="auto" loop />
 
-      <div className="garden-frame" aria-hidden="true">
-        <span className="table-felt" />
-        <span className="playing-card card-one" />
-        <span className="playing-card card-two" />
-        <span className="casino-chip chip-one" />
-        <span className="casino-chip chip-two" />
-        <span className="vegas-strip" />
-        <span className="palm palm-one" />
-        <span className="palm palm-two" />
-        <span className="chapel-glow" />
-        <span className="chapel-mark">
-          <span>Welcome to Fabulous</span>
-          <strong>Las Vegas</strong>
-          <em>Thomas & Joice Wedding</em>
-        </span>
-        <span className="flower flower-one" />
-        <span className="flower flower-two" />
-        <span className="flower flower-three" />
-        <span className="leaf leaf-one" />
-        <span className="leaf leaf-two" />
-      </div>
-
       <section className="invite-scene" aria-label="Convite de casamento de Thomas e Joice">
         <button
-          className="envelope-stage"
+          className="paper-envelope-stage"
           type="button"
           onClick={openInvite}
           aria-expanded={isOpen}
-          aria-label={isOpen ? "Convite aberto" : "Abrir convite de casamento"}
+          aria-label={isOpen ? "Convite aberto" : "Abrir convite"}
         >
-          <span className="tap-hint" aria-hidden={isOpen}>
-            <span className="hint-bouquet">
-              <span />
-              <span />
-              <span />
-            </span>
-            <span>Abrir convite</span>
-            <Sparkles size={16} />
-          </span>
-          <span className="envelope" aria-hidden="true">
-            <span className="envelope-back" />
-            <span className="hidden-letter" />
-            <span className="envelope-left" />
-            <span className="envelope-right" />
-            <span className="envelope-front" />
-            <span className="envelope-flap" />
-            <span className="wax-seal">
-              <span className="crest-top" />
-              <span className="crest-monogram">
-                <span>T</span>
-                <span>J</span>
-              </span>
-              <span className="crest-bottom" />
-            </span>
-          </span>
+          <span className="paper-envelope" style={{ backgroundImage: `url(${model4EnvelopeSrc})` }} />
         </button>
 
-        <article className="invite-card" aria-hidden={!isOpen} aria-live="polite">
-          <div className="card-flourish">
-            <Heart size={18} />
-            <span>Welcome to our Sunday morning chapel</span>
-          </div>
+        <article
+          className="invite-card autoral1-template-card"
+          style={{ "--autoral-template": `url(${autoralTemplateSrc})` } as React.CSSProperties}
+          aria-hidden={!isOpen}
+          aria-live="polite"
+        >
+          <section className="autoral1-countdown-live" aria-label="Contagem regressiva">
+            <span>Contagem regressiva</span>
+            <div>
+              {countdownItems.map((item, index) => (
+                <React.Fragment key={item.label}>
+                  {index > 0 && <i aria-hidden="true">♥</i>}
+                  <strong>
+                    <b>{String(item.value).padStart(2, "0")}</b>
+                    <small>{item.label}</small>
+                  </strong>
+                </React.Fragment>
+              ))}
+            </div>
+          </section>
 
-          <h1>Thomas & Joice</h1>
-          <p className="invite-copy">
-            Com brilho, delicadeza e a magia de Las Vegas, convidamos você para
-            celebrar nosso casamento em Gramado com um celebrante vestido de Elvis Presley.
+          <p className="autoral1-verse-live">
+            Onde Deus une dois corações nasce uma história eterna.
           </p>
 
-          <div className="info-strip">
-            <div>
-              <CalendarDays size={20} />
-              <span>18/10/2026</span>
-            </div>
-            <div>
-              <Clock size={20} />
-              <span>11:00 da manhã</span>
-            </div>
-            <div>
-              <MapPin size={20} />
-              <span>Av. das Hortênsias, 765</span>
-            </div>
-          </div>
+          <p className="autoral1-music-live">
+            {audioState === "playing"
+              ? "Tocando: Can't Help Falling in Love - Elvis Presley"
+              : "Can’t Help Falling in Love - Elvis Presley"}
+          </p>
 
-          <div className="elvis-note">
-            <Mic2 size={18} />
-            <span>Cerimonia com celebrante Elvis Presley</span>
-          </div>
-
-          <div className="countdown" aria-label="Contador para o casamento">
-            <CountdownTile label="dias" value={countdown.days} />
-            <CountdownTile label="horas" value={countdown.hours} />
-            <CountdownTile label="min" value={countdown.minutes} />
-            <CountdownTile label="seg" value={countdown.seconds} />
-          </div>
-
-          <div className="music-note">
-            {audioState === "playing" ? <Volume2 size={18} /> : <Music2 size={18} />}
-            <span>
-              {audioState === "playing"
-                ? "Tocando: Can't Help Falling in Love"
-                : "Adicione o MP3 licenciado em public/audio/cant-help-falling-in-love.mp3."}
-            </span>
-          </div>
+          <span className="autoral1-screen-reader">
+            Thomas e Joice. 18 de outubro de 2026, às 11:00 da manhã.
+            Av. das Hortênsias, 765 - Gramado, RS.
+          </span>
         </article>
       </section>
     </main>
